@@ -319,9 +319,6 @@ export const CheckoutProvider = ({ children }: CheckoutProviderProps) => {
         resetCart()
         push(`/order/confirmed/${data.id}`)
       },
-      onError: ({ data }) => {
-        alert(JSON.stringify(data))
-      },
     })
   }
 
