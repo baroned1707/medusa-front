@@ -4,6 +4,13 @@ const store = require("./store.config.json")
 module.exports = withStoreConfig({
   features: store.features,
   reactStrictMode: true,
+  images: {
+    domains: [
+      "medusa-public-images.s3.eu-west-1.amazonaws.com",
+      "localhost",
+      "https://medusa-front.onrender.com",
+    ],
+  },
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
@@ -17,3 +24,5 @@ module.exports = withStoreConfig({
     ignoreBuildErrors: true,
   },
 })
+
+console.log("next.config.js", JSON.stringify(module.exports, null, 2))
