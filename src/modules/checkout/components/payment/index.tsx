@@ -1,5 +1,6 @@
 import { useCheckout } from "@lib/context/checkout-context"
 import Spinner from "@modules/common/icons/spinner"
+import { useCart } from "medusa-react"
 import { useEffect } from "react"
 import PaymentContainer from "../payment-container"
 import StepContainer from "../step-container"
@@ -12,17 +13,20 @@ const Payment = () => {
     sameAsBilling: { state: isSame },
   } = useCheckout()
 
+  const { updateCart } = useCart()
+
   /**
    * Fallback if the payment session are not loaded properly we
    * retry to load them after a 5 second delay.
    */
   useEffect(() => {
     let timeout: NodeJS.Timeout | null = null
+    console.log(cart)
 
     if (cart?.shipping_address && cart?.payment_sessions) {
       timeout = setTimeout(() => {
         initPayment()
-      }, 5000)
+      }, 2000)
     }
 
     return () => {
@@ -58,9 +62,10 @@ const Payment = () => {
                     cart?.payment_session?.provider_id ===
                     paymentSession.provider_id
                   }
-                  setSelected={() =>
+                  setSelected={() => {
+                    updateCart.mutate({})
                     setPaymentSession(paymentSession.provider_id)
-                  }
+                  }}
                 />
               )
             })

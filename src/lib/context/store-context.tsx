@@ -206,15 +206,17 @@ export const StoreProvider = ({ children }: StoreProps) => {
             return null
           })
 
-        if (!cartRes || cartRes.completed_at) {
-          deleteCart()
-          deleteRegion()
-          await createNewCart()
-          return
-        }
+        console.log("Check cart res", cartRes)
+
+        // if (!cartRes || cartRes.completed_at) {
+        //   deleteCart()
+        //   deleteRegion()
+        //   await createNewCart()
+        //   return
+        // }
 
         setCart(cartRes)
-        ensureRegion(cartRes.region)
+        // ensureRegion(cartRes.region)
       } else {
         await createNewCart(region?.regionId)
       }

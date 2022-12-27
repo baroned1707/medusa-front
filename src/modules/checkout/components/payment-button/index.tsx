@@ -1,11 +1,13 @@
 import { useCheckout } from "@lib/context/checkout-context"
-import { PaymentSession } from "@medusajs/medusa"
+import { useStore } from "@lib/context/store-context"
+import { PaymentSession, PaymentSessionStatus } from "@medusajs/medusa"
 import Button from "@modules/common/components/button"
 import Spinner from "@modules/common/icons/spinner"
 import { OnApproveActions, OnApproveData } from "@paypal/paypal-js"
 import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
-import { useCart } from "medusa-react"
+import { useCart, useCartOrder, useOrder } from "medusa-react"
+import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 
 type PaymentButtonProps = {
@@ -49,6 +51,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ paymentSession }) => {
       )
     case "manual":
       return <ManualTestPaymentButton notReady={notReady} />
+
+    case "zalo":
+      return <ZaloPaymentButton notReady={notReady} session={paymentSession} />
+
     case "paypal":
       return (
         <PayPalPaymentButton notReady={notReady} session={paymentSession} />
@@ -217,6 +223,46 @@ const PayPalPaymentButton = ({
         disabled={notReady || submitting}
       />
     </PayPalScriptProvider>
+  )
+}
+
+const ZaloPaymentButton = ({
+  session,
+  notReady,
+}: {
+  session: PaymentSession
+  notReady: boolean
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  )
+
+  const { cart, updateCart } = useCart()
+  const { resetCart } = useStore()
+  const { isFetched, order } = useCartOrder(cart?.id as string)
+  const { push } = useRouter()
+
+  const handlePayment = async () => {
+    window.location.href = cart?.payment_session?.data.order_url as string
+  }
+
+  useEffect(() => {
+    if (isFetched) {
+      if (cart?.payment_session?.status == "authorized" && order) {
+        push(`/order/confirmed/${order.id}`).then((res) => {
+          resetCart()
+        })
+      } else {
+        updateCart.mutate({})
+      }
+    }
+  }, [isFetched])
+
+  return (
+    <Button disabled={submitting || notReady} onClick={handlePayment}>
+      {submitting ? <Spinner /> : "Checkout"}
+    </Button>
   )
 }
 

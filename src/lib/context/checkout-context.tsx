@@ -201,7 +201,9 @@ export const CheckoutProvider = ({ children }: CheckoutProviderProps) => {
       .createPaymentSessions(cartId, {
         "Idempotency-Key": IDEMPOTENCY_KEY,
       })
-      .then(({ cart }) => cart)
+      .then(({ cart }) => {
+        return cart
+      })
       .catch(() => null)
   }
 
@@ -316,6 +318,9 @@ export const CheckoutProvider = ({ children }: CheckoutProviderProps) => {
       onSuccess: ({ data }) => {
         resetCart()
         push(`/order/confirmed/${data.id}`)
+      },
+      onError: ({ data }) => {
+        alert(JSON.stringify(data))
       },
     })
   }
