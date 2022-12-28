@@ -247,20 +247,11 @@ const ZaloPaymentButton = ({
 
   const handlePayment = async () => {
     //Get new cart in server
-    const cartRes = await medusaClient.carts
-      .retrieve(cart?.id as string)
-      .then(({ cart }) => {
-        return cart
-      })
-      .catch(async (_) => {
-        return null
-      })
 
-    console.log("Check cart res", cartRes)
+    const data = await (await updateCart.mutateAsync({})).cart
+    setCart(data)
 
-    setCart(cartRes as Cart)
-
-    window.location.href = cartRes?.payment_session?.data.order_url as string
+    window.location.href = data?.payment_session?.data.order_url as string
   }
 
   useEffect(() => {
@@ -272,13 +263,6 @@ const ZaloPaymentButton = ({
       }
     }
   }, [isFetched])
-
-  useEffect(() => {
-    if (Object.keys(query).length == 0) {
-      console.log("Call Update Payment")
-      updateCart.mutate({})
-    }
-  }, [])
 
   return (
     <Button disabled={submitting || notReady} onClick={handlePayment}>
