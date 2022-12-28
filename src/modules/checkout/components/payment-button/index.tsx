@@ -237,6 +237,7 @@ const ZaloPaymentButton = ({
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   )
+  const { query } = useRouter()
 
   const { cart, updateCart } = useCart()
   const { resetCart } = useStore()
@@ -254,7 +255,9 @@ const ZaloPaymentButton = ({
           resetCart()
         })
       } else {
-        updateCart.mutate({})
+        if (Object.keys(query).length == 0) {
+          updateCart.mutate({})
+        }
       }
     }
   }, [isFetched])
