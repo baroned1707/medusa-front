@@ -254,13 +254,16 @@ const ZaloPaymentButton = ({
         push(`/order/confirmed/${order.id}`).then((res) => {
           resetCart()
         })
-      } else {
-        if (Object.keys(query).length == 0) {
-          updateCart.mutate({})
-        }
       }
     }
   }, [isFetched])
+
+  useEffect(() => {
+    if (Object.keys(query).length == 0) {
+      console.log("Call Update Payment")
+      updateCart.mutate({})
+    }
+  }, [])
 
   return (
     <Button disabled={submitting || notReady} onClick={handlePayment}>
