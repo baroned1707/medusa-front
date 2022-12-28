@@ -1,6 +1,7 @@
+import { medusaClient } from "@lib/config"
 import { useCheckout } from "@lib/context/checkout-context"
 import { useStore } from "@lib/context/store-context"
-import { PaymentSession, PaymentSessionStatus } from "@medusajs/medusa"
+import { Cart, PaymentSession, PaymentSessionStatus } from "@medusajs/medusa"
 import Button from "@modules/common/components/button"
 import Spinner from "@modules/common/icons/spinner"
 import { OnApproveActions, OnApproveData } from "@paypal/paypal-js"
@@ -239,13 +240,27 @@ const ZaloPaymentButton = ({
   )
   const { query } = useRouter()
 
-  const { cart, updateCart } = useCart()
+  const { cart, updateCart, setCart } = useCart()
   const { resetCart } = useStore()
   const { isFetched, order } = useCartOrder(cart?.id as string)
   const { push } = useRouter()
 
   const handlePayment = async () => {
-    window.location.href = cart?.payment_session?.data.order_url as string
+    //Get new cart in server
+    const cartRes = await medusaClient.carts
+      .retrieve(cart?.id as string)
+      .then(({ cart }) => {
+        return cart
+      })
+      .catch(async (_) => {
+        return null
+      })
+
+    console.log("Check cart res", cartRes)
+
+    setCart(cartRes as Cart)
+
+    window.location.href = cartRes?.payment_session?.data.order_url as string
   }
 
   useEffect(() => {
